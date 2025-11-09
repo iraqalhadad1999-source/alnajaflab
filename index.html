@@ -1,4 +1,3 @@
-# alnajaflab
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -158,10 +157,7 @@
         }
         
         .lab-1 { background-color: var(--lab1-color); color: white; }
-        .
-
-
-lab-2 { background-color: var(--lab2-color); color: white; }
+        .lab-2 { background-color: var(--lab2-color); color: white; }
         .lab-3 { background-color: var(--lab3-color); color: white; }
         
         .logout-btn {
@@ -326,9 +322,7 @@ lab-2 { background-color: var(--lab2-color); color: white; }
         }
         
         .tab-content {
-
-
-display: none;
+            display: none;
         }
         
         .tab-content.active {
@@ -449,9 +443,7 @@ display: none;
                 <li><a href="#" class="nav-link active" data-page="dashboardPage">لوحة التحكم</a></li>
                 <li id="usersManagementLink" style="display: none;"><a href="#" class="nav-link" data-page="usersPage">إدارة المستخدمين</a></li>
                 <li id="reportsLink" style="display: none;"><a href="#" class="nav-link" data-page="reportsPage">التقارير والتحليلات</a></li>
-
-عِراق مُحَمد عيسى, [11/9/2025 9:10 PM]
-<li id="chemistrySectionLink" style="display: none;"><a href="#" class="nav-link" data-page="chemistryPage">قسم الكيمياء</a></li>
+                <li id="chemistrySectionLink" style="display: none;"><a href="#" class="nav-link" data-page="chemistryPage">قسم الكيمياء</a></li>
                 <li id="warehouseSectionLink" style="display: none;"><a href="#" class="nav-link" data-page="warehousePage">المخزن</a></li>
             </ul>
         </div>
@@ -536,9 +528,7 @@ display: none;
                     <h2>إدارة المستخدمين</h2>
                 </div>
                 <div class="action-buttons">
-
-عِراق مُحَمد عيسى, [11/9/2025 9:10 PM]
-<button class="btn btn-primary" id="addUserBtn">إضافة مستخدم</button>
+                    <button class="btn btn-primary" id="addUserBtn">إضافة مستخدم</button>
                 </div>
                 <table>
                     <thead>
@@ -610,9 +600,7 @@ display: none;
                             <option value="materials">تقرير المواد</option>
                             <option value="expiry">تقرير المواد المنتهية الصلاحية</option>
                             <option value="analyzing">تقرير المواد قيد التحليل</option>
-
-عِراق مُحَمد عيسى, [11/9/2025 9:10 PM]
-<option value="labs">تقرير المختبرات</option>
+                            <option value="labs">تقرير المختبرات</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -691,9 +679,7 @@ display: none;
                         </thead>
                         <tbody id="labMaterialsTable">
                             <!-- سيتم ملؤها بالبيانات -->
-
-عِراق مُحَمد عيسى, [11/9/2025 9:10 PM]
-</tbody>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -768,9 +754,7 @@ display: none;
                 <div class="tab-content" id="viewMaterialsTab">
                     <div class="action-buttons">
                         <button class="btn btn-primary" id="refreshMaterialsBtn">تحديث القائمة</button>
-
-عِراق مُحَمد عيسى, [11/9/2025 9:10 PM]
-</div>
+                    </div>
                     <div class="materials-summary">
                         <h3>المواد المضافة بواسطة: <span id="currentUserName"></span></h3>
                         <p>إجمالي المواد: <span id="userMaterialsCount">0</span> مادة</p>
@@ -835,7 +819,7 @@ display: none;
         const defaultActivities = [];
         const defaultMaterials = [];
 
-        // بيانات التطبيق
+        // بيانات التطبيق - استخدام متغيرات عالمية بدلاً من الاعتماد الكامل على localStorage
         let currentUser = null;
         let materials = [];
         let users = [];
@@ -870,9 +854,7 @@ display: none;
 
         // عناصر قسم الكيمياء
         const selectedMaterial = document.getElementById('selectedMaterial');
-
-
-const selectedMaterialInfo = document.getElementById('selectedMaterialInfo');
+        const selectedMaterialInfo = document.getElementById('selectedMaterialInfo');
         const infoMaterialName = document.getElementById('infoMaterialName');
         const infoSupplierNumber = document.getElementById('infoSupplierNumber');
         const infoLab = document.getElementById('infoLab');
@@ -882,7 +864,10 @@ const selectedMaterialInfo = document.getElementById('selectedMaterialInfo');
         function getLocalStorage(key, defaultValue) {
             try {
                 const item = localStorage.getItem(key);
-                return item ? JSON.parse(item) : defaultValue;
+                if (item && item !== "undefined" && item !== "null") {
+                    return JSON.parse(item);
+                }
+                return defaultValue;
             } catch (error) {
                 console.error('خطأ في قراءة localStorage:', error);
                 return defaultValue;
@@ -900,6 +885,40 @@ const selectedMaterialInfo = document.getElementById('selectedMaterialInfo');
             }
         }
 
+        // دالة بديلة لحفظ البيانات في sessionStorage إذا فشل localStorage
+        function setStorage(key, value) {
+            if (!setLocalStorage(key, value)) {
+                try {
+                    sessionStorage.setItem(key, JSON.stringify(value));
+                    return true;
+                } catch (error) {
+                    console.error('خطأ في حفظ sessionStorage:', error);
+                    // استخدم المتغيرات العالمية كبديل
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // دالة بديلة لقراءة البيانات
+        function getStorage(key, defaultValue) {
+            let result = getLocalStorage(key, null);
+            if (result === null) {
+                try {
+                    const sessionItem = sessionStorage.getItem(key);
+                    if (sessionItem && sessionItem !== "undefined" && sessionItem !== "null") {
+                        result = JSON.parse(sessionItem);
+                    } else {
+                        result = defaultValue;
+                    }
+                } catch (error) {
+                    console.error('خطأ في قراءة sessionStorage:', error);
+                    result = defaultValue;
+                }
+            }
+            return result;
+        }
+
         // أحداث تسجيل الدخول
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -907,8 +926,13 @@ const selectedMaterialInfo = document.getElementById('selectedMaterialInfo');
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             
+            console.log('محاولة دخول:', username);
+            console.log('المستخدمون المتاحون:', users);
+            
             // التحقق من بيانات المستخدم
             const user = users.find(u => u.username === username && u.password === password);
+            
+            console.log('المستخدم الموجود:', user);
             
             if (user) {
                 currentUser = user;
@@ -931,11 +955,11 @@ const selectedMaterialInfo = document.getElementById('selectedMaterialInfo');
                     user: currentUser.name,
                     date: new Date().toLocaleDateString('ar-EG')
                 });
-                setLocalStorage('activities', activities);
+                setStorage('activities', activities);
                 
                 alert('تم تسجيل الدخول بنجاح!');
             } else {
-                alert('بيانات الدخول غير صحيحة!');
+                alert('بيانات الدخول غير صحيحة! الرجاء استخدام:\n\nمدير النظام: admin / admin123\nدكتور 1: doctor1 / doctor123\nدكتور 2: doctor2 / doctor123\nذاتية: self / self123');
             }
         });
 
@@ -947,7 +971,7 @@ const selectedMaterialInfo = document.getElementById('selectedMaterialInfo');
             
             // عرض المختبر إذا كان دكتور
             if (currentUser.type === 'doctor' && currentUser.lab) {
-                userLabDisplay.innerHTML = <span class="lab-badge lab-${currentUser.lab}">المختبر ${currentUser.lab}</span>;
+                userLabDisplay.innerHTML = `<span class="lab-badge lab-${currentUser.lab}">المختبر ${currentUser.lab}</span>`;
             } else {
                 userLabDisplay.innerHTML = '';
             }
@@ -978,8 +1002,7 @@ const selectedMaterialInfo = document.getElementById('selectedMaterialInfo');
             switch(status) {
                 case 'pending': return 'قيد الانتظار';
                 case 'analyzing': return 'قيد التحليل';
-
-case 'accepted': return 'مقبولة';
+                case 'accepted': return 'مقبولة';
                 case 'rejected': return 'مرفوضة';
                 default: return 'قيد الانتظار';
             }
@@ -1027,13 +1050,13 @@ case 'accepted': return 'مقبولة';
             // المواد التي لم يتم فحصها بعد في مختبر الدكتور الحالي
             const unprocessedMaterials = materials.filter(material => 
                 material.lab === currentUser.lab && 
-                (!material.analysisMethod  material.status === 'pending'  material.status === 'analyzing')
+                (!material.analysisMethod || material.status === 'pending' || material.status === 'analyzing')
             );
             
             unprocessedMaterials.forEach(material => {
                 const option = document.createElement('option');
                 option.value = material.id;
-                option.textContent = ${material.name} - ${material.supplierNumber || 'بدون رقم وارد'} (${getStatusName(material.status)});
+                option.textContent = `${material.name} - ${material.supplierNumber || 'بدون رقم وارد'} (${getStatusName(material.status)})`;
                 selectedMaterial.appendChild(option);
             });
         }
@@ -1066,8 +1089,7 @@ case 'accepted': return 'مقبولة';
                 
                 document.getElementById(`lab${i}Total`).textContent = labMaterials.length;
                 document.getElementById(`lab${i}Expired`).textContent = labMaterials.filter(m => isExpired(m.expiryDate)).length;
-
-document.getElementById(`lab${i}Doctors`).textContent = labDoctors.length;
+                document.getElementById(`lab${i}Doctors`).textContent = labDoctors.length;
             }
         }
 
@@ -1126,7 +1148,7 @@ document.getElementById(`lab${i}Doctors`).textContent = labDoctors.length;
             
             if (userMaterials.length === 0) {
                 const row = document.createElement('tr');
-                row.innerHTML = <td colspan="10" style="text-align: center;">لا توجد مواد مضافة</td>;
+                row.innerHTML = `<td colspan="10" style="text-align: center;">لا توجد مواد مضافة</td>`;
                 warehouseMaterialsTable.appendChild(row);
                 return;
             }
@@ -1156,15 +1178,14 @@ document.getElementById(`lab${i}Doctors`).textContent = labDoctors.length;
         }
 
         // تحميل مواد المختبر (للدكتور)
-
-function loadLabMaterials() {
+        function loadLabMaterials() {
             const labMaterials = materials.filter(material => material.lab === currentUser.lab);
             const labMaterialsTable = document.getElementById('labMaterialsTable');
             labMaterialsTable.innerHTML = '';
             
             if (labMaterials.length === 0) {
                 const row = document.createElement('tr');
-                row.innerHTML = <td colspan="6" style="text-align: center;">لا توجد مواد في هذا المختبر</td>;
+                row.innerHTML = `<td colspan="6" style="text-align: center;">لا توجد مواد في هذا المختبر</td>`;
                 labMaterialsTable.appendChild(row);
                 return;
             }
@@ -1231,15 +1252,15 @@ function loadLabMaterials() {
             };
             
             materials.push(material);
-            setLocalStorage('materials', materials);
+            setStorage('materials', materials);
             
             // تسجيل النشاط
             activities.push({
-                action: إضافة مادة جديدة: ${material.name} للمختبر ${getLabName(material.lab)},
+                action: `إضافة مادة جديدة: ${material.name} للمختبر ${getLabName(material.lab)}`,
                 user: currentUser.name,
                 date: new Date().toLocaleDateString('ar-EG')
             });
-            setLocalStorage('activities', JSON.stringify(activities));
+            setStorage('activities', activities);
             
             alert('تم إضافة المادة إلى المخزن بنجاح!');
             warehouseForm.reset();
@@ -1249,9 +1270,7 @@ function loadLabMaterials() {
 
         // إضافة مستخدم من قبل المدير
         document.getElementById('addUserForm').addEventListener('submit', function(e) {
-            e.
-
-preventDefault();
+            e.preventDefault();
             
             const user = {
                 username: document.getElementById('newUsername').value,
@@ -1262,15 +1281,15 @@ preventDefault();
             };
             
             users.push(user);
-            setLocalStorage('users', users);
+            setStorage('users', users);
             
             // تسجيل النشاط
             activities.push({
-                action: إضافة مستخدم جديد: ${user.name},
+                action: `إضافة مستخدم جديد: ${user.name}`,
                 user: currentUser.name,
                 date: new Date().toLocaleDateString('ar-EG')
             });
-            setLocalStorage('activities', activities);
+            setStorage('activities', activities);
             
             alert('تم إضافة المستخدم بنجاح!');
             closeUserForm();
@@ -1301,15 +1320,15 @@ preventDefault();
             materials[materialIndex].examinedBy = currentUser.username;
             materials[materialIndex].examinedDate = new Date().toISOString().split('T')[0];
             
-            setLocalStorage('materials', materials);
+            setStorage('materials', materials);
             
             // تسجيل النشاط
             activities.push({
-                action: فحص مادة: ${materials[materialIndex].name} - ${materials[materialIndex].analysisMethod} (${getStatusName(materials[materialIndex].status)}),
+                action: `فحص مادة: ${materials[materialIndex].name} - ${materials[materialIndex].analysisMethod} (${getStatusName(materials[materialIndex].status)})`,
                 user: currentUser.name,
                 date: new Date().toLocaleDateString('ar-EG')
             });
-            setLocalStorage('activities', activities);
+            setStorage('activities', activities);
             
             alert('تم إضافة نتيجة الفحص بنجاح!');
             document.getElementById('chemistryForm').reset();
@@ -1323,15 +1342,15 @@ preventDefault();
         function deleteMaterial(materialId) {
             if (confirm('هل أنت متأكد من حذف هذه المادة؟')) {
                 materials = materials.filter(m => m.id !== materialId);
-                setLocalStorage('materials', materials);
+                setStorage('materials', materials);
                 
                 // تسجيل النشاط
                 activities.push({
-                    action: حذف مادة,
+                    action: `حذف مادة`,
                     user: currentUser.name,
                     date: new Date().toLocaleDateString('ar-EG')
                 });
-                setLocalStorage('activities', activities);
+                setStorage('activities', activities);
                 
                 if (currentUser.type === 'admin') {
                     loadLabsStats();
@@ -1350,22 +1369,20 @@ preventDefault();
         function deleteUser(username) {
             if (username === currentUser.username) {
                 alert('لا يمكن حذف المستخدم الحالي!');
-
-
-return;
+                return;
             }
             
             if (confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
                 users = users.filter(u => u.username !== username);
-                setLocalStorage('users', users);
+                setStorage('users', users);
                 
                 // تسجيل النشاط
                 activities.push({
-                    action: حذف مستخدم,
+                    action: `حذف مستخدم`,
                     user: currentUser.name,
                     date: new Date().toLocaleDateString('ar-EG')
                 });
-                setLocalStorage('activities', activities);
+                setStorage('activities', activities);
                 
                 loadUsersTable();
                 loadDashboardData();
@@ -1460,13 +1477,18 @@ return;
 
         // تهيئة التطبيق
         function initApp() {
-
-
-            users = getLocalStorage('users', defaultUsers);
-            materials = getLocalStorage('materials', defaultMaterials);
-            activities = getLocalStorage('activities', defaultActivities);
+            // تحميل البيانات من التخزين مع معالجة الأخطاء
+            users = getStorage('users', defaultUsers);
+            materials = getStorage('materials', defaultMaterials);
+            activities = getStorage('activities', defaultActivities);
             
             console.log('البيانات المحملة:', { users, materials, activities });
+            
+            // إذا لم تكن هناك بيانات، استخدم البيانات الافتراضية
+            if (!users || users.length === 0) {
+                users = [...defaultUsers];
+                setStorage('users', users);
+            }
         }
 
         // تشغيل التطبيق
